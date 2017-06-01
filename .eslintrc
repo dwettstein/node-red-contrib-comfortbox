@@ -1,5 +1,7 @@
 {
+  "extends": "eslint:recommended",
   "rules": {
-    "max-len": "off"
+    "max-len": "off",
+    "no-undef": "off"
   }
 }

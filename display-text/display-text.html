@@ -1,0 +1,57 @@
+<script type="text/javascript">
+    RED.nodes.registerType('display text', {
+        category: 'comfortbox',
+        color: '#DAC4B4',
+        defaults: {
+            name: {value: ''},
+            server: {type: 'comfortbox-api-server', required: true},
+            boxId: {required: true, validate: RED.validators.number()},
+            text: {value: ''},
+            return: {value: 'txt'}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'envelope.png',
+        label: function() {
+            return this.name || (this.boxId ? 'display text on box with id: ' + this.boxId : 'display text');
+        },
+        labelStyle: function() {
+            return this.name ? 'node_label_italic' : '';
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="display text">
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-boxId"><i class="fa fa-id-card-o"></i> Box id</label>
+        <input type="text" id="node-input-boxId">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-text"><i class="fa fa-file-text-o"></i> Text</label>
+        <input type="text" id="node-input-text" placeholder="Hello world!">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-ret"><i class="fa fa-arrow-left"></i> Return</label>
+        <select type="text" id="node-input-ret" style="width:70%;">
+            <option value="txt">a UTF-8 string</option>
+            <option value="bin">a binary buffer</option>
+            <option value="obj">a parsed JSON object</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="display text">
+    <p>Provides a node for displaying text on a ComfortBox.</p>
+</script>

@@ -6,6 +6,15 @@
   "dependencies": {},
   "keywords": [],
   "node-red": {
-    "nodes": {}
+    "nodes": {
+      "comfortbox-api-server": "comfortbox-api-server/comfortbox-api-server.js",
+      "display text": "display-text/display-text.js"
+    }
+  },
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0"
   }
 }

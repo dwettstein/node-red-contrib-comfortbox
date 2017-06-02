@@ -9,5 +9,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Initial setup for packaging a npm module
 - Config `comfortbox-api-server`
 - Node `display text`
+- Node `register box`
 
 [Unreleased]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/master...HEAD

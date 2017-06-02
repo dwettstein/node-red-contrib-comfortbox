@@ -3,12 +3,14 @@
   "version": "0.0.0",
   "license": "MIT",
   "description": "A collection of Node-RED nodes for configuring and using the ComfortBox API services (https://github.com/dwettstein/comfortbox-api-services)",
+  "repository": "github:dwettstein/node-red-contrib-comfortbox",
   "dependencies": {},
   "keywords": [],
   "node-red": {
     "nodes": {
       "comfortbox-api-server": "comfortbox-api-server/comfortbox-api-server.js",
-      "display text": "display-text/display-text.js"
+      "display text": "display-text/display-text.js",
+      "register box": "register-box/register-box.js"
     }
   },
   "scripts": {

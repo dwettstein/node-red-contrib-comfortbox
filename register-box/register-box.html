@@ -1,0 +1,69 @@
+<script type="text/javascript">
+    RED.nodes.registerType('register box', {
+        category: 'comfortbox',
+        color: '#DAC4B4',
+        defaults: {
+            name: {value: ''},
+            server: {type: 'comfortbox-api-server', required: true},
+            boxName: {value: ''},
+            particleId: {required: true, validate: RED.validators.regex(/^[a-fA-F0-9]{24}$/)},
+            created: {value: ''},
+            labels: {value: ''},
+            return: {value: 'txt'}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'inject.png',
+        label: function() {
+            return this.name || (this.particleId ? 'register box ' + this.particleId : 'register box');
+        },
+        labelStyle: function() {
+            return this.name ? 'node_label_italic' : '';
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="register box">
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-boxName"><i class="fa fa-file-text-o"></i> Box name</label>
+        <input type="text" id="node-input-boxName">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-particleId"><i class="fa fa-id-card-o"></i> Particle id</label>
+        <input type="text" id="node-input-particleId" placeholder="0123456789abcdef01234567">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-created"><i class="fa fa-id-card-o"></i> Created</label>
+        <input type="text" id="node-input-created" placeholder="2017-06-02T08:15:45.148Z (leave empty for current datetime)">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-labels"><i class="fa fa-id-card-o"></i> Labels</label>
+        <input type="text" id="node-input-labels" placeholder="comma-separated labels">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-return"><i class="fa fa-arrow-left"></i> Return</label>
+        <select type="text" id="node-input-return" style="width:70%;">
+            <option value="txt">a UTF-8 string</option>
+            <option value="bin">a binary buffer</option>
+            <option value="obj">a parsed JSON object</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="register box">
+    <p>Provides a node for registering new ComfortBoxes to the API services.</p>
+</script>

@@ -10,7 +10,8 @@
     "nodes": {
       "comfortbox-api-server": "comfortbox-api-server/comfortbox-api-server.js",
       "display text": "display-text/display-text.js",
-      "register box": "register-box/register-box.js"
+      "register box": "register-box/register-box.js",
+      "configure box": "configure-box/configure-box.js"
     }
   },
   "scripts": {

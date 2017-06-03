@@ -10,5 +10,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Config `comfortbox-api-server`
 - Node `display text`
 - Node `register box`
+- Node `configure box`
 
 [Unreleased]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/master...HEAD

@@ -1,0 +1,133 @@
+<script type="text/javascript">
+    RED.nodes.registerType('configure box', {
+        category: 'comfortbox',
+        color: '#DAC4B4',
+        defaults: {
+            name: {value: ''},
+            server: {type: 'comfortbox-api-server', required: true},
+            boxId: {required: true, validate: RED.validators.number()},
+            boxName: {value: ''},
+            particleId: {value: '', validate: RED.validators.regex(/^[a-fA-F0-9]{24}$/)},
+            labels: {value: ''},
+            return: {value: 'txt'},
+            mqttHost: {value: ''},
+            mqttPort: {value: '1883', validate: RED.validators.number()},
+            dataInterval: {value: '5', validate: RED.validators.number()},
+            worktime: {value: '', validate: RED.validators.regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9]$/)},
+            doShowDataRegularly: {value: false}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'db.png',
+        label: function() {
+            return this.name || (this.particleId ? 'configure box ' + this.particleId : 'configure box');
+        },
+        labelStyle: function() {
+            return this.name ? 'node_label_italic' : '';
+        },
+        oneditprepare: function () {
+            var tabs = RED.tabs.create({
+                id: 'node-configure-box-tabs',
+                onchange: function(tab) {
+                    $('#node-configure-box-tabs-content').children().hide();
+                    $('#' + tab.id).show();
+                }
+            });
+            tabs.addTab({
+                id: "configure-box-tab-general",
+                label: "General"
+            });
+            tabs.addTab({
+                id: "configure-box-tab-mqtt",
+                label: "MQTT"
+            });
+            tabs.addTab({
+                id: "configure-box-tab-data",
+                label: "Data"
+            });
+            setTimeout(function() {
+                tabs.resize();
+            }, 0);
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="configure box">
+    <div class="form-row">
+        <ul style="background: #fff; min-width: 600px; margin-bottom: 20px;" id="node-configure-box-tabs"></ul>
+    </div>
+
+    <div id="node-configure-box-tabs-content" style="min-height: 170px;">
+
+        <div id="configure-box-tab-general" style="display:none">
+            <div class="form-row">
+                <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
+                <input type="text" id="node-input-server">
+            </div>
+
+            <div class="form-row">
+                <label for="node-input-boxId"><i class="fa fa-id-card"></i> Box id</label>
+                <input type="text" id="node-input-boxId">
+            </div>
+
+            <div class="form-row">
+                <label for="node-input-boxName"><i class="fa fa-file-text"></i> Box name</label>
+                <input type="text" id="node-input-boxName">
+            </div>
+
+            <div class="form-row">
+                <label for="node-input-particleId"><i class="fa fa-id-card"></i> Particle id</label>
+                <input type="text" id="node-input-particleId" placeholder="0123456789abcdef01234567">
+            </div>
+
+            <div class="form-row">
+                <label for="node-input-labels"><i class="fa fa-tags"></i> Labels</label>
+                <input type="text" id="node-input-labels" placeholder="comma-separated labels">
+            </div>
+
+            <div class="form-row">
+                <label for="node-input-return"><i class="fa fa-arrow-left"></i> Return</label>
+                <select type="text" id="node-input-return" style="width:70%;">
+                    <option value="txt">a UTF-8 string</option>
+                    <option value="bin">a binary buffer</option>
+                    <option value="obj">a parsed JSON object</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+                <input type="text" id="node-input-name" placeholder="Name">
+            </div>
+        </div>
+
+        <div id="configure-box-tab-mqtt" style="display:none">
+            <div class="form-row">
+                <label for="node-input-mqttHost"><i class="fa fa-server"></i> MQTT host</label>
+                <input type="text" id="node-input-mqttHost">
+            </div>
+            <div class="form-row">
+                <label for="node-input-mqttPort"><i class="fa fa-server"></i> MQTT port</label>
+                <input type="text" id="node-input-mqttPort">
+            </div>
+        </div>
+
+        <div id="configure-box-tab-data" style="display:none">
+            <div class="form-row">
+                <label for="node-input-dataInterval"><i class="fa fa-bar-chart"></i> Send interval</label>
+                <input type="text" id="node-input-dataInterval">
+            </div>
+            <div class="form-row">
+                <label for="node-input-worktime"><i class="fa fa-clock"></i> Working hours</label>
+                <input type="text" id="node-input-worktime">
+            </div>
+            <div class="form-row">
+                <label for="node-input-doShowDataRegularly"><i class="fa fa-refresh"></i> Show data regularly</label>
+                <input type="checkbox" id="node-input-doShowDataRegularly" style="display: inline-block; width: auto; vertical-align: top;">
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="configure box">
+    <p>Configures an existing ComfortBox in the API services.</p>
+</script>

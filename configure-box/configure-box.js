@@ -1,6 +1,8 @@
 module.exports = function(RED) {
   'use strict';
 
+  var http = require('http');
+  var https = require('https');
   var requestComfortboxApi = require('../lib/requestComfortboxApi.js');
 
   function ConfigureBoxNode(config) {
@@ -31,7 +33,6 @@ module.exports = function(RED) {
     var node = this;
 
     node.on('input', function(msg) {
-
       var doPatchBox = false;
       var comfortbox = {};
       if (node.boxName) {
@@ -66,13 +67,74 @@ module.exports = function(RED) {
         node.send(msg);
         node.status({});
       }
-
     });
 
     node.on("close", function() {
       node.status({});
     });
   }
+
+  // See here: https://stackoverflow.com/questions/37265230/node-red-get-configuration-node-value-in-admin-ui
+  RED.httpAdmin.get('/api/ComfortBoxes', function(req, res) {
+    var server = RED.nodes.getNode(req.query.server);
+
+    var resObj = {};
+    resObj.payload = "[]";
+    if (server) {
+      var payload = null;
+      var options = {
+        hostname: server.host,
+        port: server.port,
+        path: '/api/ComfortBoxes' + (server.accessToken ? '?access_token=' + server.accessToken : ''),
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      }
+
+      if (server.host === 'localhost') {
+        // Ignore certificate errors if host is localhost.
+        options.rejectUnauthorized = false;
+      }
+
+      var localReq = (server.protocol === 'https' ? https : http).request(options, function(localRes) {
+        localRes.setEncoding('utf8');
+        resObj.statusCode = localRes.statusCode;
+        resObj.headers = localRes.headers;
+        resObj.responseUrl = localRes.responseUrl;
+        resObj.payload = "";
+
+        localRes.on('data', function(chunk) {
+          resObj.payload += chunk;
+        });
+
+        localRes.on('end', function() {
+          res.setHeader('Content-Type', 'application/json');
+          res.send(resObj.payload);
+        });
+      });
+
+      localReq.on('error', function(err) {
+        RED.log.error(err.toString());
+        resObj.payload = err.toString();
+        resObj.statusCode = err.code;
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify(resObj));
+      });
+
+      if (payload) {
+        localReq.write(payload);
+      }
+
+      localReq.end();
+    } else {
+      resObj.payload = 'Error: No server config found! You have to select or create one.';
+      resObj.statusCode = 400;
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(resObj));
+    }
+  });
 
   RED.nodes.registerType('configure box', ConfigureBoxNode);
 };

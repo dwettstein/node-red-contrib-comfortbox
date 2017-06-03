@@ -26,6 +26,49 @@
             return this.name ? 'node_label_italic' : '';
         },
         oneditprepare: function () {
+            var node = this;
+            var devices;
+            var currentBoxName = node.boxName;
+
+            function updateDevices(server) {
+                if (server) {
+                    $.getJSON('api/ComfortBoxes?server=' + server, function(data) {
+                        devices = data;
+                        var devs = Object.keys(data);
+                        if (devs.length !== 0) {
+                            for (var d in devs) {
+                                if (devs.hasOwnProperty(d)) {
+                                    $('<option/>', {
+                                        'value': devs[d],
+                                        'text': data[devs[d]].name
+                                    }).appendTo('#node-input-device');
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            updateDevices(node.server);
+
+            $('#node-input-server').on('click', function() {
+                $("#node-input-device").empty();
+                $('#node-input-boxId').val();
+                $('#node-input-boxName').val('');
+                $('#node-input-particleId').val('');
+                $('#node-input-labels').val('');
+                updateDevices(node.server);
+            });
+
+            $('#node-input-device').on('change', function() {
+                var selected = $('#node-input-device option:selected').first().val();
+                if (devices && selected) {
+                    $('#node-input-boxId').val(devices[selected].id);
+                    $('#node-input-boxName').val(devices[selected].name);
+                    $('#node-input-particleId').val(devices[selected].particleId);
+                    $('#node-input-labels').val(devices[selected].labels ? devices[selected].labels.join(', ') : '');
+                }
+            });
+
             var tabs = RED.tabs.create({
                 id: 'node-configure-box-tabs',
                 onchange: function(tab) {
@@ -34,20 +77,29 @@
                 }
             });
             tabs.addTab({
-                id: "configure-box-tab-general",
-                label: "General"
+                id: 'configure-box-tab-general',
+                label: 'General'
             });
             tabs.addTab({
-                id: "configure-box-tab-mqtt",
-                label: "MQTT"
+                id: 'configure-box-tab-mqtt',
+                label: 'MQTT'
             });
             tabs.addTab({
-                id: "configure-box-tab-data",
-                label: "Data"
+                id: 'configure-box-tab-data',
+                label: 'Data'
             });
             setTimeout(function() {
                 tabs.resize();
             }, 0);
+
+            setTimeout(function () {
+                // Select option by name, see here: https://stackoverflow.com/questions/314636/how-do-you-select-a-particular-option-in-a-select-element-in-jquery
+                if (currentBoxName) {
+                    $('#node-input-device option').filter(function(i, e) {
+                        return $(e).text() == currentBoxName;
+                    }).prop('selected', true);
+                }
+            }, 200);
         }
     });
 </script>
@@ -66,8 +118,14 @@
             </div>
 
             <div class="form-row">
+                <label for="node-input-device"><i class="fa fa-tasks"></i> Device</label>
+                <select id="node-input-device">
+                </select>
+            </div>
+
+            <div class="form-row">
                 <label for="node-input-boxId"><i class="fa fa-id-card"></i> Box id</label>
-                <input type="text" id="node-input-boxId">
+                <input type="text" id="node-input-boxId" readonly>
             </div>
 
             <div class="form-row">

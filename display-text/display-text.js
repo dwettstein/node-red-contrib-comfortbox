@@ -32,7 +32,7 @@ module.exports = function(RED) {
           'Content-Length': Buffer.byteLength(payload),
           'Accept': 'application/json'
         }
-      }
+      };
 
       requestComfortboxApi(msg, node, options, payload);
     });

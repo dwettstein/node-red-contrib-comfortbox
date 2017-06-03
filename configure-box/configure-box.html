@@ -7,7 +7,7 @@
             server: {type: 'comfortbox-api-server', required: true},
             boxId: {required: true, validate: RED.validators.number()},
             boxName: {value: ''},
-            particleId: {value: '', validate: RED.validators.regex(/^[a-fA-F0-9]{24}$/)},
+            particleId: {value: '', validate: RED.validators.regex(/^([a-fA-F0-9]{24})?$/)},
             labels: {value: ''},
             return: {value: 'txt'},
             mqttHost: {value: ''},

@@ -5,6 +5,7 @@
         defaults: {
             name: {value: ''},
             server: {type: 'comfortbox-api-server', required: true},
+            device: {value: ''},
             boxId: {required: true, validate: RED.validators.number()},
             boxName: {value: ''},
             particleId: {value: '', validate: RED.validators.regex(/^([a-fA-F0-9]{24})?$/)},
@@ -28,9 +29,9 @@
         oneditprepare: function () {
             var node = this;
             var devices;
-            var currentBoxName = node.boxName;
+            var currentBoxName = node.boxName + ' - ' + node.boxId;
 
-            function updateDevices(server) {
+            function updateDevices(server, callback) {
                 if (server) {
                     // See here: https://stackoverflow.com/questions/37265230/node-red-get-configuration-node-value-in-admin-ui
                     $.getJSON('node-red/ComfortBoxes?server=' + server, function(data) {
@@ -40,16 +41,24 @@
                             for (var d in devs) {
                                 if (devs.hasOwnProperty(d)) {
                                     $('<option/>', {
-                                        'value': devs[d],
-                                        'text': data[devs[d]].name
+                                        'value': JSON.stringify(data[devs[d]]),
+                                        'text': data[devs[d]].name + ' - ' + data[devs[d]].id
                                     }).appendTo('#node-input-device');
                                 }
                             }
                         }
+                        if (callback && typeof callback === 'function') {
+                            callback();
+                        }
                     });
                 }
             }
-            updateDevices(node.server);
+            updateDevices(node.server, function () {
+                // Select option by name, see here: https://stackoverflow.com/questions/314636/how-do-you-select-a-particular-option-in-a-select-element-in-jquery
+                if (currentBoxName) {
+                    $('#node-input-device option:contains("' + currentBoxName + '")').prop('selected', true);
+                }
+            });
 
             $('#node-input-server').on('click', function() {
                 $("#node-input-device").empty();
@@ -57,16 +66,19 @@
                 $('#node-input-boxName').val('');
                 $('#node-input-particleId').val('');
                 $('#node-input-labels').val('');
-                updateDevices(node.server);
+                updateDevices(node.server, null);
             });
 
             $('#node-input-device').on('change', function() {
                 var selected = $('#node-input-device option:selected').first().val();
-                if (devices && selected) {
-                    $('#node-input-boxId').val(devices[selected].id);
-                    $('#node-input-boxName').val(devices[selected].name);
-                    $('#node-input-particleId').val(devices[selected].particleId);
-                    $('#node-input-labels').val(devices[selected].labels ? devices[selected].labels.join(', ') : '');
+                if (selected) {
+                    var selectedDevice = JSON.parse(selected);
+                    if (selectedDevice) {
+                        $('#node-input-boxId').val(selectedDevice.id);
+                        $('#node-input-boxName').val(selectedDevice.name);
+                        $('#node-input-particleId').val(selectedDevice.particleId);
+                        $('#node-input-labels').val(selectedDevice.labels ? selectedDevice.labels.join(', ') : '');
+                    }
                 }
             });
 
@@ -92,15 +104,6 @@
             setTimeout(function() {
                 tabs.resize();
             }, 0);
-
-            setTimeout(function () {
-                // Select option by name, see here: https://stackoverflow.com/questions/314636/how-do-you-select-a-particular-option-in-a-select-element-in-jquery
-                if (currentBoxName) {
-                    $('#node-input-device option').filter(function(i, e) {
-                        return $(e).text() == currentBoxName;
-                    }).prop('selected', true);
-                }
-            }, 200);
         }
     });
 </script>

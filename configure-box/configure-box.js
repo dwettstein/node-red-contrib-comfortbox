@@ -6,17 +6,16 @@ module.exports = function(RED) {
   function ConfigureBoxNode(config) {
     RED.nodes.createNode(this, config);
 
-    var inputLabels = [];
-    if (config.labels) {
-      inputLabels = config.labels.split(/[,]\s?/);
-    }
-
     // Tab general
     this.server = RED.nodes.getNode(config.server);
+    if (config.device) {
+      this.device = JSON.parse(config.device);
+    }
     this.boxId = config.boxId;
     this.boxName = config.boxName;
     this.particleId = config.particleId;
-    this.labels = inputLabels;
+
+    this.labels = config.labels ? config.labels.split(/[,]\s?/) : [];
     this.return = config.return || "txt";
 
     // Tab MQTT
@@ -35,15 +34,15 @@ module.exports = function(RED) {
 
       var doPatchBox = false;
       var comfortbox = {};
-      if (node.boxName) {
+      if (node.boxName !== node.device.name) {
         comfortbox.name = node.boxName;
         doPatchBox = true;
       }
-      if (node.particleId) {
+      if (node.particleId !== node.device.particleId) {
         comfortbox.particleId = node.particleId;
         doPatchBox = true;
       }
-      if (node.labels && node.labels.length > 0) {
+      if (node.labels && node.labels.length > 0 && JSON.stringify(node.labels) != JSON.stringify(node.device.labels)) {
         comfortbox.labels = node.labels;
         doPatchBox = true;
       }
@@ -78,6 +77,8 @@ module.exports = function(RED) {
         msg.payload = "The node had nothing to configure.";
         node.send(msg);
       }
+
+      // TODO: Other configuration calls.
     });
 
     node.on("close", function() {

@@ -1,7 +1,7 @@
 module.exports = function(RED) {
   'use strict';
 
-  var requestComfortboxApi = require('../lib/requestComfortboxApi.js');
+  var apiRequest = require('../lib/apiRequest.js');
 
   function RegisterBoxNode(config) {
     RED.nodes.createNode(this, config);
@@ -21,29 +21,47 @@ module.exports = function(RED) {
     var node = this;
 
     node.on('input', function(msg) {
+      if (!node.server) {
+        var errMsg = JSON.stringify({error: 'No server config found! You have to select or create one.'});
+        node.error(errMsg);
+        node.status({fill: 'red', shape: 'ring', text: '400'});
+        node.send(errMsg);
+      } else {
+        var comfortbox = {
+          name: node.boxName,
+          particleId: node.particleId,
+          created: node.created,
+          labels: node.labels
+        };
 
-      var comfortbox = {
-        name: node.boxName,
-        particleId: node.particleId,
-        created: node.created,
-        labels: node.labels
-      };
+        var payload = JSON.stringify(comfortbox);
 
-      var payload = JSON.stringify(comfortbox);
+        var options = {
+          hostname: node.server.host,
+          port: node.server.port,
+          path: '/api/ComfortBoxes' + (node.server.accessToken ? '?access_token=' + node.server.accessToken : ''),
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload),
+            'Accept': 'application/json'
+          }
+        };
 
-      var options = {
-        hostname: node.server.host,
-        port: node.server.port,
-        path: '/api/ComfortBoxes' + (node.server.accessToken ? '?access_token=' + node.server.accessToken : ''),
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(payload),
-          'Accept': 'application/json'
+        if (node.server.host === 'localhost') {
+          // Ignore certificate errors if host is localhost.
+          options.rejectUnauthorized = false;
         }
-      };
 
-      requestComfortboxApi(msg, node, options, payload);
+        apiRequest(node.server.protocol, node.return, options, payload, function (res) {
+          node.status({});
+          if (res && res.statusCode / 100 != 2) {
+            node.error(res);
+            node.status({fill: 'red', shape: 'ring', text: res.statusCode});
+          }
+          node.send(res);
+        });
+      }
     });
 
     node.on("close", function() {

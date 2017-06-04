@@ -32,7 +32,8 @@
 
             function updateDevices(server) {
                 if (server) {
-                    $.getJSON('api/ComfortBoxes?server=' + server, function(data) {
+                    // See here: https://stackoverflow.com/questions/37265230/node-red-get-configuration-node-value-in-admin-ui
+                    $.getJSON('node-red/ComfortBoxes?server=' + server, function(data) {
                         devices = data;
                         var devs = Object.keys(data);
                         if (devs.length !== 0) {

@@ -1,7 +1,7 @@
 module.exports = function(RED) {
   'use strict';
 
-  var requestComfortboxApi = require('../lib/requestComfortboxApi.js');
+  var apiRequest = require('../lib/apiRequest.js');
 
   function DisplayTextNode(config) {
     RED.nodes.createNode(this, config);
@@ -15,26 +15,45 @@ module.exports = function(RED) {
     var node = this;
 
     node.on('input', function(msg) {
-      var payload;
-      if (node.text) {
-        payload = 'text=' + encodeURIComponent(node.text);
+      if (!node.server) {
+        var errMsg = JSON.stringify({error: 'No server config found! You have to select or create one.'});
+        node.error(errMsg);
+        node.status({fill: 'red', shape: 'ring', text: '400'});
+        node.send(errMsg);
       } else {
-        payload = 'text=' + encodeURIComponent(msg.payload);
-      }
-
-      var options = {
-        hostname: node.server.host,
-        port: node.server.port,
-        path: '/api/ComfortBoxes/' + node.boxId + '/displayText' + (node.server.accessToken ? '?access_token=' + node.server.accessToken : ''),
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': Buffer.byteLength(payload),
-          'Accept': 'application/json'
+        var payload;
+        if (node.text) {
+          payload = 'text=' + encodeURIComponent(node.text);
+        } else {
+          payload = 'text=' + encodeURIComponent(msg.payload);
         }
-      };
 
-      requestComfortboxApi(msg, node, options, payload);
+        var options = {
+          hostname: node.server.host,
+          port: node.server.port,
+          path: '/api/ComfortBoxes/' + node.boxId + '/displayText' + (node.server.accessToken ? '?access_token=' + node.server.accessToken : ''),
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(payload),
+            'Accept': 'application/json'
+          }
+        };
+
+        if (node.server.host === 'localhost') {
+          // Ignore certificate errors if host is localhost.
+          options.rejectUnauthorized = false;
+        }
+
+        apiRequest(node.server.protocol, node.return, options, payload, function (res) {
+          node.status({});
+          if (res && res.statusCode / 100 != 2) {
+            node.error(res);
+            node.status({fill: 'red', shape: 'ring', text: res.statusCode});
+          }
+          node.send(res);
+        });
+      }
     });
 
     node.on("close", function() {

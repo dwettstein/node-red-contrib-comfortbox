@@ -15,7 +15,7 @@
             mqttPort: {value: '1883', validate: RED.validators.number()},
             dataInterval: {value: '5', validate: RED.validators.number()},
             worktime: {value: '', validate: RED.validators.regex(/^(([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9])?$/)},
-            doShowDataRegularly: {value: false}
+            doShowDataRegularly: {value: '', validate: RED.validators.regex(/^(true|false)$/)}
         },
         inputs: 1,
         outputs: 1,
@@ -212,7 +212,7 @@
             </div>
             <div class="form-row">
                 <label for="node-input-doShowDataRegularly"><i class="fa fa-refresh"></i> Show data regularly</label>
-                <input type="checkbox" id="node-input-doShowDataRegularly" style="display: inline-block; width: auto; vertical-align: top;">
+                <input type="text" id="node-input-doShowDataRegularly" placeholder="true or false">
             </div>
         </div>
     </div>

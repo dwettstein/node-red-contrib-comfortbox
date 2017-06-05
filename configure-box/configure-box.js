@@ -34,15 +34,15 @@ module.exports = function(RED) {
 
       var doPatchBox = false;
       var comfortbox = {};
-      if (node.boxName !== node.device.name) {
+      if (!node.device || node.boxName !== node.device.name) {
         comfortbox.name = node.boxName;
         doPatchBox = true;
       }
-      if (node.particleId !== node.device.particleId) {
+      if (!node.device || node.particleId !== node.device.particleId) {
         comfortbox.particleId = node.particleId;
         doPatchBox = true;
       }
-      if (node.labels && node.labels.length > 0 && JSON.stringify(node.labels) != JSON.stringify(node.device.labels)) {
+      if (!node.device || node.labels && node.labels.length > 0 && JSON.stringify(node.labels) != JSON.stringify(node.device.labels)) {
         comfortbox.labels = node.labels;
         doPatchBox = true;
       }

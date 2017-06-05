@@ -29,27 +29,51 @@
         oneditprepare: function () {
             var node = this;
             var devices;
-            var currentBoxName = node.boxName + ' - ' + node.boxId;
+            var currentBoxName = node.boxName && node.boxId ? node.boxName + ' - ' + node.boxId : '';
 
             function updateDevices(server, callback) {
+                if (!server && !node.server) {
+                    var serverOptions = $('#node-input-server option');
+                    // If there is only one server option then it is the option "_ADD_".
+                    if (serverOptions && serverOptions.length > 1) {
+                        var firstOption = serverOptions.first();
+                        if (firstOption.val() !== '_ADD_') {
+                            firstOption.prop('selected', true);
+                            node.server = firstOption.val();
+                            server = node.server;
+                        }
+                    } else {
+                        $('#node-input-boxId').prop('readonly', false);
+                    }
+                }
+
                 if (server) {
                     // See here: https://stackoverflow.com/questions/37265230/node-red-get-configuration-node-value-in-admin-ui
                     $.getJSON('node-red/ComfortBoxes?server=' + server, function(data) {
-                        devices = data;
-                        var devs = Object.keys(data);
-                        if (devs.length !== 0) {
-                            for (var d in devs) {
-                                if (devs.hasOwnProperty(d)) {
-                                    $('<option/>', {
-                                        'value': JSON.stringify(data[devs[d]]),
-                                        'text': data[devs[d]].name + ' - ' + data[devs[d]].id
-                                    }).appendTo('#node-input-device');
+                        $('#node-input-device').empty();
+                        $('#node-input-device-error').remove();
+                        if (data.statusCode && data.statusCode / 100 != 2) {
+                            $('#node-input-device').parent().before('<div id="node-input-device-error" class="notification notification-error">' + data.error.toString() + '</div>');
+                        } else {
+                            devices = data;
+                            if (devices.length > 0) {
+                                $('#node-input-boxId').prop('readonly', true);
+                                for (var d in devices) {
+                                    if (devices.hasOwnProperty(d)) {
+                                        $('<option/>', {
+                                            'value': JSON.stringify(devices[d]),
+                                            'text': devices[d].name + ' - ' + devices[d].id
+                                        }).appendTo('#node-input-device');
+                                    }
                                 }
+                            } else {
+                                $('#node-input-boxId').prop('readonly', false);
+                            }
+                            if (callback && typeof callback === 'function') {
+                                callback();
                             }
                         }
-                        if (callback && typeof callback === 'function') {
-                            callback();
-                        }
+
                     });
                 }
             }
@@ -61,7 +85,11 @@
             });
 
             $('#node-input-server').on('click', function() {
-                $("#node-input-device").empty();
+                var selected = $('#node-input-server option:selected').first().val();
+                if (selected && selected !== '_ADD_') {
+                    node.server = selected;
+                }
+                $('#node-input-device').empty();
                 $('#node-input-boxId').val();
                 $('#node-input-boxName').val('');
                 $('#node-input-particleId').val('');
@@ -69,7 +97,7 @@
                 updateDevices(node.server, null);
             });
 
-            $('#node-input-device').on('change', function() {
+            $('#node-input-device').on('click', function() {
                 var selected = $('#node-input-device option:selected').first().val();
                 if (selected) {
                     var selectedDevice = JSON.parse(selected);

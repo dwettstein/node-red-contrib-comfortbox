@@ -18,12 +18,9 @@ module.exports = function(RED) {
 
     var resObj = {};
     if (!server) {
-      //JSON.stringify({error: 'No server config found! You have to select or create one.'});
-      resObj.payload = "[]"
-      resObj.statusCode = 400;
-      res.setHeader('Content-Type', 'application/json');
-      //res.send(JSON.stringify(resObj));
-      res.send(resObj.payload);
+      resObj.error = 'The server config with id "' + req.query.server + '" was not found! Please deploy the flow at least once.';
+      resObj.statusCode = 500;
+      res.send(JSON.stringify(resObj));
     } else {
       var payload = null;
       var options = {

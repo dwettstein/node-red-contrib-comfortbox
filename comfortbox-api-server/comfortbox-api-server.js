@@ -1,8 +1,8 @@
+'use strict';
+
+var apiRequest = require('../lib/apiRequest.js');
+
 module.exports = function(RED) {
-  'use strict';
-
-  var apiRequest = require('../lib/apiRequest.js');
-
   function ComfortboxApiServerNode(config) {
     RED.nodes.createNode(this, config);
     this.host = config.host;
@@ -12,15 +12,16 @@ module.exports = function(RED) {
   }
 
   RED.httpAdmin.get('/node-red/ComfortBoxes', function(req, res) {
+    var server;
     if (req.query && req.query.server) {
-      var server = RED.nodes.getNode(req.query.server);
+      server = RED.nodes.getNode(req.query.server);
     }
 
-    var resObj = {};
     if (!server) {
-      resObj.error = 'The server config with id "' + req.query.server + '" was not found! Please deploy the flow at least once.';
-      resObj.statusCode = 500;
-      res.send(JSON.stringify(resObj));
+      var resObjErr = {};
+      resObjErr.error = 'The server config with id "' + req.query.server + '" was not found! Please deploy the flow at least once.';
+      resObjErr.statusCode = 500;
+      res.send(JSON.stringify(resObjErr));
     } else {
       var payload = null;
       var options = {
@@ -30,18 +31,18 @@ module.exports = function(RED) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      }
+          'Accept': 'application/json',
+        },
+      };
 
       if (server.host === 'localhost') {
         // Ignore certificate errors if host is localhost.
         options.rejectUnauthorized = false;
       }
 
-      apiRequest(server.protocol, 'txt', options, payload, function (resObj) {
+      apiRequest(server.protocol, 'txt', options, payload, function(resObj) {
         res.setHeader('Content-Type', 'application/json');
-        if (resObj && resObj.statusCode / 100 != 2) {
+        if (resObj && resObj.statusCode / 100 !== 2) {
           res.send(JSON.stringify(resObj));
         } else {
           res.send(resObj.payload);
@@ -50,5 +51,5 @@ module.exports = function(RED) {
     }
   });
 
-  RED.nodes.registerType("comfortbox-api-server", ComfortboxApiServerNode);
-}
+  RED.nodes.registerType('comfortbox-api-server', ComfortboxApiServerNode);
+};

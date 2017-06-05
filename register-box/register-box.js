@@ -1,8 +1,8 @@
+'use strict';
+
+var apiRequest = require('../lib/apiRequest.js');
+
 module.exports = function(RED) {
-  'use strict';
-
-  var apiRequest = require('../lib/apiRequest.js');
-
   function RegisterBoxNode(config) {
     RED.nodes.createNode(this, config);
 
@@ -16,7 +16,7 @@ module.exports = function(RED) {
     this.particleId = config.particleId;
     this.created = config.created || (new Date()).toISOString();
     this.labels = inputLabels;
-    this.return = config.return || "txt";
+    this.return = config.return || 'txt';
 
     var node = this;
 
@@ -31,7 +31,7 @@ module.exports = function(RED) {
           name: node.boxName,
           particleId: node.particleId,
           created: node.created,
-          labels: node.labels
+          labels: node.labels,
         };
 
         var payload = JSON.stringify(comfortbox);
@@ -44,8 +44,8 @@ module.exports = function(RED) {
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(payload),
-            'Accept': 'application/json'
-          }
+            'Accept': 'application/json',
+          },
         };
 
         if (node.server.host === 'localhost') {
@@ -53,9 +53,9 @@ module.exports = function(RED) {
           options.rejectUnauthorized = false;
         }
 
-        apiRequest(node.server.protocol, node.return, options, payload, function (res) {
+        apiRequest(node.server.protocol, node.return, options, payload, function(res) {
           node.status({});
-          if (res && res.statusCode / 100 != 2) {
+          if (res && res.statusCode / 100 !== 2) {
             node.error(res);
             node.status({fill: 'red', shape: 'ring', text: res.statusCode});
           }
@@ -64,7 +64,7 @@ module.exports = function(RED) {
       }
     });
 
-    node.on("close", function() {
+    node.on('close', function() {
       node.status({});
     });
   }

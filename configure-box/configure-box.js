@@ -1,8 +1,8 @@
+'use strict';
+
+var apiRequest = require('../lib/apiRequest.js');
+
 module.exports = function(RED) {
-  'use strict';
-
-  var apiRequest = require('../lib/apiRequest.js');
-
   function ConfigureBoxNode(config) {
     RED.nodes.createNode(this, config);
 
@@ -16,7 +16,7 @@ module.exports = function(RED) {
     this.particleId = config.particleId;
 
     this.labels = config.labels ? config.labels.split(/[,]\s?/) : [];
-    this.return = config.return || "txt";
+    this.return = config.return || 'txt';
 
     // Tab MQTT
     this.mqttHost = config.mqttHost;
@@ -42,7 +42,7 @@ module.exports = function(RED) {
         comfortbox.particleId = node.particleId;
         doPatchBox = true;
       }
-      if (!node.device || node.labels && node.labels.length > 0 && JSON.stringify(node.labels) != JSON.stringify(node.device.labels)) {
+      if (!node.device || (node.labels && node.labels.length > 0 && JSON.stringify(node.labels) !== JSON.stringify(node.device.labels))) {
         comfortbox.labels = node.labels;
         doPatchBox = true;
       }
@@ -57,31 +57,31 @@ module.exports = function(RED) {
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(payload),
-            'Accept': 'application/json'
-          }
-        }
+            'Accept': 'application/json',
+          },
+        };
 
         if (node.server.host === 'localhost') {
           // Ignore certificate errors if host is localhost.
           options.rejectUnauthorized = false;
         }
 
-        apiRequest(node.server.protocol, node.return, options, payload, function (res) {
-          if (res && res.statusCode / 100 != 2) {
+        apiRequest(node.server.protocol, node.return, options, payload, function(res) {
+          if (res && res.statusCode / 100 !== 2) {
             node.error(res);
             node.status({fill: 'red', shape: 'ring', text: res.statusCode});
           }
           node.send(res);
         });
       } else {
-        msg.payload = "The node had nothing to configure.";
+        msg.payload = 'The node had nothing to configure.';
         node.send(msg);
       }
 
       // TODO: Other configuration calls.
     });
 
-    node.on("close", function() {
+    node.on('close', function() {
       node.status({});
     });
   }

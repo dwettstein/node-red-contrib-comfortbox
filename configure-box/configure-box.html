@@ -32,6 +32,9 @@
             var currentBoxName = node.boxName && node.boxId ? node.boxName + ' - ' + node.boxId : '';
 
             function updateDevices(server, callback) {
+                $('#node-input-device').empty();
+                $('#node-input-device-error').remove();
+
                 if (!server && !node.server) {
                     var serverOptions = $('#node-input-server option');
                     // If there is only one server option then it is the option "_ADD_".
@@ -50,10 +53,8 @@
                 if (server) {
                     // See here: https://stackoverflow.com/questions/37265230/node-red-get-configuration-node-value-in-admin-ui
                     $.getJSON('node-red/ComfortBoxes?server=' + server, function(data) {
-                        $('#node-input-device').empty();
-                        $('#node-input-device-error').remove();
                         if (data.statusCode && data.statusCode / 100 != 2) {
-                            $('#node-input-device').parent().before('<div id="node-input-device-error" class="notification notification-error">' + data.error.toString() + '</div>');
+                            $('#node-input-device').parent().before('<div id="node-input-device-error" class="notification notification-error">' + data.error + '</div>');
                         } else {
                             devices = data;
                             if (devices.length > 0) {
@@ -73,7 +74,6 @@
                                 callback();
                             }
                         }
-
                     });
                 }
             }

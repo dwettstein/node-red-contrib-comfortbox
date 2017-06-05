@@ -5,6 +5,7 @@
         defaults: {
             name: {value: ''},
             server: {type: 'comfortbox-api-server', required: true},
+            device: {value: ''},
             boxId: {required: true, validate: RED.validators.number()},
             text: {value: ''},
             return: {value: 'txt'}
@@ -17,6 +18,90 @@
         },
         labelStyle: function() {
             return this.name ? 'node_label_italic' : '';
+        },
+        oneditprepare: function () {
+            var node = this;
+            var devices;
+            var currentBoxName = node.boxName && node.boxId ? node.boxName + ' - ' + node.boxId : '';
+
+            function updateDevices(server, callback) {
+                $('#node-input-device').empty();
+                $('#node-input-device-error').remove();
+
+                if (!server && !node.server) {
+                    var serverOptions = $('#node-input-server option');
+                    // If there is only one server option then it is the option "_ADD_".
+                    if (serverOptions && serverOptions.length > 1) {
+                        var firstOption = serverOptions.first();
+                        if (firstOption.val() !== '_ADD_') {
+                            firstOption.prop('selected', true);
+                            node.server = firstOption.val();
+                            server = node.server;
+                        }
+                    } else {
+                        $('#node-input-boxId').prop('readonly', false);
+                    }
+                }
+
+                if (server) {
+                    // See here: https://stackoverflow.com/questions/37265230/node-red-get-configuration-node-value-in-admin-ui
+                    $.getJSON('node-red/ComfortBoxes?server=' + server, function(data) {
+                        if (data.statusCode && data.statusCode / 100 != 2) {
+                            $('#node-input-device').parent().before('<div id="node-input-device-error" class="notification notification-error">' + data.error + '</div>');
+                        } else {
+                            devices = data;
+                            if (devices.length > 0) {
+                                $('#node-input-boxId').prop('readonly', true);
+                                for (var d in devices) {
+                                    if (devices.hasOwnProperty(d)) {
+                                        $('<option/>', {
+                                            'value': JSON.stringify(devices[d]),
+                                            'text': devices[d].name + ' - ' + devices[d].id
+                                        }).appendTo('#node-input-device');
+                                    }
+                                }
+                            } else {
+                                $('#node-input-boxId').prop('readonly', false);
+                            }
+                            if (callback && typeof callback === 'function') {
+                                callback();
+                            }
+                        }
+                    });
+                }
+            }
+            updateDevices(node.server, function () {
+                // Select option by name, see here: https://stackoverflow.com/questions/314636/how-do-you-select-a-particular-option-in-a-select-element-in-jquery
+                if (currentBoxName) {
+                    $('#node-input-device option:contains("' + currentBoxName + '")').prop('selected', true);
+                }
+            });
+
+            $('#node-input-server').on('click', function() {
+                var selected = $('#node-input-server option:selected').first().val();
+                if (selected && selected !== '_ADD_') {
+                    node.server = selected;
+                }
+                $('#node-input-device').empty();
+                $('#node-input-boxId').val();
+                $('#node-input-boxName').val('');
+                $('#node-input-particleId').val('');
+                $('#node-input-labels').val('');
+                updateDevices(node.server, null);
+            });
+
+            $('#node-input-device').on('click', function() {
+                var selected = $('#node-input-device option:selected').first().val();
+                if (selected) {
+                    var selectedDevice = JSON.parse(selected);
+                    if (selectedDevice) {
+                        $('#node-input-boxId').val(selectedDevice.id);
+                        $('#node-input-boxName').val(selectedDevice.name);
+                        $('#node-input-particleId').val(selectedDevice.particleId);
+                        $('#node-input-labels').val(selectedDevice.labels ? selectedDevice.labels.join(', ') : '');
+                    }
+                }
+            });
         }
     });
 </script>
@@ -28,8 +113,14 @@
     </div>
 
     <div class="form-row">
+        <label for="node-input-device"><i class="fa fa-tasks"></i> Device</label>
+        <select id="node-input-device">
+        </select>
+    </div>
+
+    <div class="form-row">
         <label for="node-input-boxId"><i class="fa fa-id-card"></i> Box id</label>
-        <input type="text" id="node-input-boxId">
+        <input type="text" id="node-input-boxId" readonly>
     </div>
 
     <div class="form-row">

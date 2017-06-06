@@ -7,6 +7,9 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
 
     this.server = RED.nodes.getNode(config.server);
+    if (config.device) {
+      this.device = JSON.parse(config.device);
+    }
     this.boxId = config.boxId;
     this.text = config.text;
     this.name = config.name;

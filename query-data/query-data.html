@@ -1,0 +1,315 @@
+<script type="text/javascript">
+    RED.nodes.registerType('query data', {
+        category: 'comfortbox',
+        color: '#DAC4B4',
+        defaults: {
+            name: {value: ''},
+            server: {type: 'comfortbox-api-server', required: true},
+            device: {value: ''},
+            boxId: {required: true, validate: RED.validators.number()},
+            metricName: {value: '', required: true},
+            startRelativeValue: {value: '', validate: RED.validators.regex(/^[0-9]*$/)},
+            startRelativeUnit: {value: 'months'},
+            startAbsolute: {value: '', validate: RED.validators.regex(/^[0-9]*$/)},
+            endRelativeValue: {value: '', validate: RED.validators.regex(/^[0-9]*$/)},
+            endRelativeUnit: {value: 'default'},
+            endAbsolute: {value: '', validate: RED.validators.regex(/^[0-9]*$/)},
+            aggregatorName: {value: 'none'},
+            aggregatorValue: {value: '', validate: RED.validators.regex(/^[0-9]*$/)},
+            aggregatorUnit: {value: 'days'},
+            return: {value: 'txt'}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'db.png',
+        label: function() {
+            return this.name || (this.metricName && this.boxId ? 'query data \'' + this.metricName + '\' on box with id: ' + this.boxId : 'query data');
+        },
+        labelStyle: function() {
+            return this.name ? 'node_label_italic' : '';
+        },
+        oneditprepare: function () {
+            var node = this;
+            var devices;
+            var currentBoxName = node.boxName && node.boxId ? node.boxName + ' - ' + node.boxId : '';
+
+            function updateDevices(server, callback) {
+                $('#node-input-device').empty();
+                $('#node-input-device-error').remove();
+
+                if (!server && !node.server) {
+                    var serverOptions = $('#node-input-server option');
+                    // If there is only one server option then it is the option "_ADD_".
+                    if (serverOptions && serverOptions.length > 1) {
+                        var firstOption = serverOptions.first();
+                        if (firstOption.val() !== '_ADD_') {
+                            firstOption.prop('selected', true);
+                            node.server = firstOption.val();
+                            server = node.server;
+                        }
+                    } else {
+                        $('#node-input-boxId').prop('readonly', false);
+                    }
+                }
+
+                if (server) {
+                    // See here: https://stackoverflow.com/questions/37265230/node-red-get-configuration-node-value-in-admin-ui
+                    $.getJSON('node-red/ComfortBoxes?server=' + server, function(data) {
+                        if (data.statusCode && data.statusCode / 100 != 2) {
+                            $('#node-input-device').parent().before('<div id="node-input-device-error" class="notification notification-error">' + data.error + '</div>');
+                        } else {
+                            devices = data;
+                            if (devices.length > 0) {
+                                $('#node-input-boxId').prop('readonly', true);
+                                for (var d in devices) {
+                                    if (devices.hasOwnProperty(d)) {
+                                        $('<option/>', {
+                                            'value': JSON.stringify(devices[d]),
+                                            'text': devices[d].name + ' - ' + devices[d].id
+                                        }).appendTo('#node-input-device');
+                                    }
+                                }
+                            } else {
+                                $('#node-input-boxId').prop('readonly', false);
+                            }
+                            if (callback && typeof callback === 'function') {
+                                callback();
+                            }
+                        }
+                    });
+                }
+            }
+            updateDevices(node.server, function () {
+                // Select option by name, see here: https://stackoverflow.com/questions/314636/how-do-you-select-a-particular-option-in-a-select-element-in-jquery
+                if (currentBoxName) {
+                    $('#node-input-device option:contains("' + currentBoxName + '")').prop('selected', true);
+                }
+            });
+
+            $('#node-input-server').on('click', function() {
+                var selected = $('#node-input-server option:selected').first().val();
+                if (selected && selected !== '_ADD_') {
+                    node.server = selected;
+                }
+                $('#node-input-device').empty();
+                $('#node-input-boxId').val();
+                $('#node-input-boxName').val('');
+                $('#node-input-particleId').val('');
+                $('#node-input-labels').val('');
+                updateDevices(node.server, null);
+            });
+
+            $('#node-input-device').on('click', function() {
+                var selected = $('#node-input-device option:selected').first().val();
+                if (selected) {
+                    var selectedDevice = JSON.parse(selected);
+                    if (selectedDevice) {
+                        $('#node-input-boxId').val(selectedDevice.id);
+                        $('#node-input-boxName').val(selectedDevice.name);
+                        $('#node-input-particleId').val(selectedDevice.particleId);
+                        $('#node-input-labels').val(selectedDevice.labels ? selectedDevice.labels.join(', ') : '');
+                    }
+                }
+            });
+
+            $('#node-input-startRelativeValue').on('keyup', function() {
+                if ($('#node-input-startRelativeValue').val() === '') {
+                    $('#node-input-startAbsolute').prop('readonly', false);
+                } else {
+                    $('#node-input-startAbsolute').prop('readonly', true);
+                }
+            });
+
+            $('#node-input-startAbsolute').on('keyup', function() {
+                if ($('#node-input-startAbsolute').val() === '') {
+                    $('#node-input-startRelativeValue').prop('readonly', false);
+                    $('#node-input-startRelativeUnit').prop('disabled', false);
+                } else {
+                    $('#node-input-startRelativeValue').prop('readonly', true);
+                    $('#node-input-startRelativeUnit').prop('disabled', true);
+                }
+            });
+
+            $('#node-input-endRelativeValue').on('keyup', function() {
+                if ($('#node-input-endRelativeValue').val() === '') {
+                    $('#node-input-endAbsolute').prop('readonly', false);
+                } else {
+                    $('#node-input-endAbsolute').prop('readonly', true);
+                }
+            });
+
+            $('#node-input-endAbsolute').on('keyup', function() {
+                if ($('#node-input-endAbsolute').val() === '') {
+                    $('#node-input-endRelativeValue').prop('readonly', false);
+                    $('#node-input-endRelativeUnit').prop('disabled', false);
+                } else {
+                    $('#node-input-endRelativeValue').prop('readonly', true);
+                    $('#node-input-endRelativeUnit').prop('disabled', true);
+                }
+            });
+
+            $('#node-input-aggregatorValue').parent().hide();
+            $('#node-input-aggregatorUnit').parent().hide();
+
+            $('#node-input-aggregatorName').on('change', function() {
+                var selected = $('#node-input-aggregatorName option:selected').first().val();
+                if (selected === 'none') {
+                    $('#node-input-aggregatorValue').parent().hide();
+                    $('#node-input-aggregatorUnit').parent().hide();
+                } else {
+                    $('#node-input-aggregatorValue').parent().show();
+                    $('#node-input-aggregatorUnit').parent().show();
+                }
+            });
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="query data">
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-device"><i class="fa fa-tasks"></i> Device</label>
+        <select id="node-input-device">
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-boxId"><i class="fa fa-id-card"></i> Box id</label>
+        <input type="text" id="node-input-boxId" readonly>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-metricName"><i class="fa fa-line-chart"></i> Metric</label>
+        <select type="text" id="node-input-metricName" style="width:70%;">
+            <option value="temp">temperature</option>
+            <option value="hum">humidity</option>
+            <option value="co2">CO2</option>
+            <option value="hpa">pressure</option>
+            <option value="wind">wind</option>
+            <option value="lux">illuminance</option>
+            <option value="sound">sound level</option>
+            <option value="bat">battery level</option>
+            <option value="online">online event</option>
+            <option value="offline">offline event</option>
+            <option value="event.button.0">button thumb-up event</option>
+            <option value="event.button.1">button thumb-down event</option>
+            <option value="event.tap">tap event</option>
+            <option value="event.dtap">double-tap event</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-startRelativeValue"><i class="fa fa-calendar"></i> Start relative value</label>
+        <input type="text" id="node-input-startRelativeValue">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-startRelativeUnit"><i class="fa fa-calendar"></i> Start relative unit</label>
+        <select type="text" id="node-input-startRelativeUnit" style="width:70%;">
+            <option value="years">years</option>
+            <option value="months">months</option>
+            <option value="weeks">weeks</option>
+            <option value="days">days</option>
+            <option value="hours">hours</option>
+            <option value="minutes">minutes</option>
+            <option value="seconds">seconds</option>
+            <option value="milliseconds">milliseconds</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-startAbsolute"><i class="fa fa-calendar"></i> Start absolute value</label>
+        <input type="text" id="node-input-startAbsolute" placeholder="unix epoch timestamp in milliseconds">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-endRelativeValue"><i class="fa fa-calendar"></i> End relative value</label>
+        <input type="text" id="node-input-endRelativeValue" placeholder="leave empty for current time">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-endRelativeUnit"><i class="fa fa-calendar"></i> End relative unit</label>
+        <select type="text" id="node-input-endRelativeUnit" style="width:70%;">
+            <option value="default">default</option>
+            <option value="years">years</option>
+            <option value="months">months</option>
+            <option value="weeks">weeks</option>
+            <option value="days">days</option>
+            <option value="hours">hours</option>
+            <option value="minutes">minutes</option>
+            <option value="seconds">seconds</option>
+            <option value="milliseconds">milliseconds</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-endAbsolute"><i class="fa fa-calendar"></i> End absolute value</label>
+        <input type="text" id="node-input-endAbsolute" placeholder="unix epoch timestamp in milliseconds (leave empty for current time)">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-aggregatorName"><i class="fa fa-cogs"></i> Aggregator</label>
+        <select type="text" id="node-input-aggregatorName" style="width:70%;">
+            <option value="none">none</option>
+            <option value="avg">average</option>
+            <option value="count">count</option>
+            <option value="dev">dev</option>
+            <option value="diff">difference</option>
+            <option value="div">div</option>
+            <option value="first">first</option>
+            <option value="gaps">gaps</option>
+            <option value="last">last</option>
+            <option value="least_squares">least squares</option>
+            <option value="max">max</option>
+            <option value="min">min</option>
+            <option value="percentile">percentile</option>
+            <option value="rate">rate</option>
+            <option value="sampler">sampler</option>
+            <option value="save_as">save as</option>
+            <option value="scale">scale</option>
+            <option value="sum">sum</option>
+            <option value="trim">trim</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-aggregatorValue"><i class="fa fa-cogs"></i> Aggregator value</label>
+        <input type="text" id="node-input-aggregatorValue">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-aggregatorUnit"><i class="fa fa-cogs"></i> Aggregator unit</label>
+        <select type="text" id="node-input-aggregatorUnit" style="width:70%;">
+            <option value="years">years</option>
+            <option value="months">months</option>
+            <option value="weeks">weeks</option>
+            <option value="days">days</option>
+            <option value="hours">hours</option>
+            <option value="minutes">minutes</option>
+            <option value="seconds">seconds</option>
+            <option value="milliseconds">milliseconds</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-return"><i class="fa fa-arrow-left"></i> Return</label>
+        <select type="text" id="node-input-return" style="width:70%;">
+            <option value="txt">a UTF-8 string</option>
+            <option value="bin">a binary buffer</option>
+            <option value="obj">a parsed JSON object</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="query data">
+    <p>Query data from a ComfortBox.</p>
+</script>

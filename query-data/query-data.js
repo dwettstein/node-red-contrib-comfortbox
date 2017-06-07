@@ -7,10 +7,9 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
 
     this.server = RED.nodes.getNode(config.server);
-    if (config.device) {
-      this.device = JSON.parse(config.device);
-    }
+    this.device = config.device;
     this.boxId = config.boxId;
+    this.particleId = config.particleId;
     this.metricName = config.metricName;
     this.startRelativeValue = config.startRelativeValue;
     this.startRelativeUnit = config.startRelativeUnit;
@@ -27,6 +26,29 @@ module.exports = function(RED) {
     var node = this;
 
     node.on('input', function(msg) {
+      if (node.device === 'payload') {
+        try {
+          node.device = JSON.parse(msg.payload);
+        } catch (e) {
+          node.error(e);
+          node.status({fill: 'red', shape: 'ring', text: e});
+          msg.payload = e;
+          node.send(msg);
+          return;
+        }
+      } else if (node.device === 'manual') {
+        node.device = null;
+      } else {
+        try {
+          node.device = JSON.parse(node.device);
+        } catch (e) {
+          node.error(e);
+          node.status({fill: 'red', shape: 'ring', text: e});
+          msg.payload = e;
+          node.send(msg);
+          return;
+        }
+      }
       var hasError = false;
       var errMsg;
 

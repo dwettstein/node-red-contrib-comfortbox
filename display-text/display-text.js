@@ -7,9 +7,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
 
     this.server = RED.nodes.getNode(config.server);
-    if (config.device) {
-      this.device = JSON.parse(config.device);
-    }
+    this.device = config.device;
     this.boxId = config.boxId;
     this.text = config.text;
     this.name = config.name;
@@ -18,6 +16,30 @@ module.exports = function(RED) {
     var node = this;
 
     node.on('input', function(msg) {
+      if (node.device === 'payload') {
+        try {
+          node.device = JSON.parse(msg.payload);
+        } catch (e) {
+          node.error(e);
+          node.status({fill: 'red', shape: 'ring', text: e});
+          msg.payload = e;
+          node.send(msg);
+          return;
+        }
+      } else if (node.device === 'manual') {
+        node.device = null;
+      } else {
+        try {
+          node.device = JSON.parse(node.device);
+        } catch (e) {
+          node.error(e);
+          node.status({fill: 'red', shape: 'ring', text: e});
+          msg.payload = e;
+          node.send(msg);
+          return;
+        }
+      }
+
       if (!node.server) {
         var errMsg = JSON.stringify({error: 'No server config found! You have to select or create one.'});
         node.error(errMsg);

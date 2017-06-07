@@ -5,7 +5,7 @@
         defaults: {
             name: {value: ''},
             server: {type: 'comfortbox-api-server', required: true},
-            device: {value: ''},
+            device: {value: 'payload'},
             boxId: {required: true, validate: RED.validators.number()},
             boxName: {value: ''},
             particleId: {value: '', validate: RED.validators.regex(/^([a-fA-F0-9]{24})?$/)},
@@ -33,6 +33,8 @@
 
             function updateDevices(server, callback) {
                 $('#node-input-device').empty();
+                $('<option/>', {value: 'payload', text: 'device from msg.payload'}).appendTo('#node-input-device');
+                $('<option/>', {value: 'manual', text: 'manual inputs'}).appendTo('#node-input-device');
                 $('#node-input-device-error').remove();
 
                 if (!server && !node.server) {
@@ -45,8 +47,6 @@
                             node.server = firstOption.val();
                             server = node.server;
                         }
-                    } else {
-                        $('#node-input-boxId').prop('readonly', false);
                     }
                 }
 
@@ -58,17 +58,14 @@
                         } else {
                             devices = data;
                             if (devices.length > 0) {
-                                $('#node-input-boxId').prop('readonly', true);
                                 for (var d in devices) {
                                     if (devices.hasOwnProperty(d)) {
                                         $('<option/>', {
-                                            'value': JSON.stringify(devices[d]),
-                                            'text': devices[d].name + ' - ' + devices[d].id
+                                            value: JSON.stringify(devices[d]),
+                                            text: devices[d].name + ' - ' + devices[d].id
                                         }).appendTo('#node-input-device');
                                     }
                                 }
-                            } else {
-                                $('#node-input-boxId').prop('readonly', false);
                             }
                             if (callback && typeof callback === 'function') {
                                 callback();
@@ -89,7 +86,6 @@
                 if (selected && selected !== '_ADD_') {
                     node.server = selected;
                 }
-                $('#node-input-device').empty();
                 $('#node-input-boxId').val();
                 $('#node-input-boxName').val('');
                 $('#node-input-particleId').val('');
@@ -99,14 +95,17 @@
 
             $('#node-input-device').on('click', function() {
                 var selected = $('#node-input-device option:selected').first().val();
-                if (selected) {
+                if (selected && selected !== 'payload' && selected !== 'manual') {
                     var selectedDevice = JSON.parse(selected);
                     if (selectedDevice) {
                         $('#node-input-boxId').val(selectedDevice.id);
+                        $('#node-input-boxId').prop('readonly', true);
                         $('#node-input-boxName').val(selectedDevice.name);
                         $('#node-input-particleId').val(selectedDevice.particleId);
                         $('#node-input-labels').val(selectedDevice.labels ? selectedDevice.labels.join(', ') : '');
                     }
+                } else {
+                    $('#node-input-boxId').prop('readonly', false);
                 }
             });
 
@@ -152,6 +151,8 @@
             <div class="form-row">
                 <label for="node-input-device"><i class="fa fa-tasks"></i> Device</label>
                 <select id="node-input-device">
+                    <option value="payload">device from msg.payload</option>
+                    <option value="manual">manual inputs</option>
                 </select>
             </div>
 

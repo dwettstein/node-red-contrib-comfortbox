@@ -27,12 +27,22 @@ module.exports = function(RED) {
         node.status({fill: 'red', shape: 'ring', text: '400'});
         node.send(errMsg);
       } else {
+        var doRemoveMsgInput = false;
+        if (!node.particleId) {
+          node.particleId = msg.payload;
+          doRemoveMsgInput = true;
+        }
+
         var comfortbox = {
           name: node.boxName,
           particleId: node.particleId,
           created: node.created,
           labels: node.labels,
         };
+
+        if (doRemoveMsgInput) {
+          node.particleId = '';
+        }
 
         var payload = JSON.stringify(comfortbox);
 

@@ -30,7 +30,13 @@ module.exports = function(RED) {
     node.on('input', function(msg) {
       if (node.device === 'payload') {
         try {
-          node.device = JSON.parse(msg.payload);
+          if (typeof msg.payload === 'string') {
+            node.device = JSON.parse(msg.payload);
+          } else {
+            node.device = msg.payload;
+          }
+          node.boxId = node.device.id;
+          node.particleId = node.device.particleId;
         } catch (e) {
           node.error(e);
           node.status({fill: 'red', shape: 'ring', text: e});
@@ -39,10 +45,17 @@ module.exports = function(RED) {
           return;
         }
       } else if (node.device === 'manual') {
-        node.device = null;
+        node.device = {
+          id: node.boxId,
+          name: node.boxName,
+          particleId: node.particleId,
+          labels: node.labels,
+        };
       } else {
         try {
-          node.device = JSON.parse(node.device);
+          if (typeof node.device === 'string') {
+            node.device = JSON.parse(node.device);
+          }
         } catch (e) {
           node.error(e);
           node.status({fill: 'red', shape: 'ring', text: e});
@@ -60,15 +73,15 @@ module.exports = function(RED) {
       // ********************************************************************************
       var doBoxPatch = false;
       var comfortbox = {};
-      if (!node.device || node.boxName !== node.device.name) {
+      if (node.device && node.boxName !== node.device.name) {
         comfortbox.name = node.boxName;
         doBoxPatch = true;
       }
-      if (!node.device || node.particleId !== node.device.particleId) {
+      if (node.device && node.particleId !== node.device.particleId) {
         comfortbox.particleId = node.particleId;
         doBoxPatch = true;
       }
-      if (!node.device || (node.labels && node.labels.length > 0 && JSON.stringify(node.labels) !== JSON.stringify(node.device.labels))) {
+      if (node.device && (node.labels && node.labels.length > 0 && JSON.stringify(node.labels) !== JSON.stringify(node.device.labels))) {
         comfortbox.labels = node.labels;
         doBoxPatch = true;
       }

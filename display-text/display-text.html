@@ -5,7 +5,7 @@
         defaults: {
             name: {value: ''},
             server: {type: 'comfortbox-api-server', required: true},
-            device: {value: ''},
+            device: {required: true, value: 'manual'},
             boxId: {required: true, validate: RED.validators.number()},
             text: {value: ''},
             return: {value: 'txt'}
@@ -22,7 +22,7 @@
         oneditprepare: function () {
             var node = this;
             var devices;
-            var currentBoxName = node.boxName && node.boxId ? node.boxName + ' - ' + node.boxId : '';
+            var currentBoxOption = node.boxId ? ' - ' + node.boxId : '';
 
             function updateDevices(server, callback) {
                 $('#node-input-device').empty();
@@ -69,8 +69,8 @@
             }
             updateDevices(node.server, function () {
                 // Select option by name, see here: https://stackoverflow.com/questions/314636/how-do-you-select-a-particular-option-in-a-select-element-in-jquery
-                if (currentBoxName) {
-                    $('#node-input-device option:contains("' + currentBoxName + '")').prop('selected', true);
+                if (currentBoxOption && node.device !== 'payload' && node.device !== 'manual') {
+                    $('#node-input-device option:contains("' + currentBoxOption + '")').prop('selected', true);
                 }
             });
 
@@ -97,6 +97,8 @@
                         $('#node-input-particleId').val(selectedDevice.particleId);
                         $('#node-input-labels').val(selectedDevice.labels ? selectedDevice.labels.join(', ') : '');
                     }
+                } else if (selected === 'payload') {
+                    $('#node-input-boxId').prop('readonly', true);
                 } else {
                     $('#node-input-boxId').prop('readonly', false);
                 }

@@ -2,10 +2,11 @@
   "name": "node-red-contrib-comfortbox",
   "version": "0.0.0",
   "license": "MIT",
-  "description": "A collection of Node-RED nodes for configuring and using the ComfortBox API services (https://github.com/dwettstein/comfortbox-api-services)",
+  "description": "Node-RED package with nodes for configuring and using the ComfortBox API services (https://github.com/dwettstein/comfortbox-api-services)",
   "repository": "github:dwettstein/node-red-contrib-comfortbox",
-  "dependencies": {},
-  "keywords": [],
+  "keywords": [
+    "comfortbox"
+  ],
   "node-red": {
     "nodes": {
       "comfortbox-api-server": "comfortbox-api-server/comfortbox-api-server.js",
@@ -17,6 +18,7 @@
   "scripts": {
     "lint": "./node_modules/.bin/eslint ."
   },
+  "dependencies": {},
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-loopback": "^8.0.0"

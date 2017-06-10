@@ -4,28 +4,29 @@
         defaults: {
             host: {value: 'localhost', required: true},
             port: {value: 3000, required: true, validate: RED.validators.number()},
-            protocol: {value: 'https', required: true},
+            useTls: {value: false},
             accessToken: {value: ''},
         },
         label: function() {
-            return this.protocol + '://' + (this.host || 'localhost') + (this.port ? ':' + this.port : '');
+            return (this.useTls ? 'https' : 'http') + '://' + (this.host || 'localhost') + (this.port ? ':' + this.port : '');
         }
     });
 </script>
 
 <script type="text/x-red" data-template-name="comfortbox-api-server">
     <div class="form-row">
-        <label for="node-config-input-host"><i class="fa fa-server"></i> Host</label>
-        <input type="text" id="node-config-input-host">
+        <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
+        <input class="input-append-left" type="text" id="node-config-input-host" placeholder="localhost">
+
+        <label for="node-config-input-port" style="margin-left: 10px; width: 35px;"> Port</label>
+        <input type="text" id="node-config-input-port" placeholder="3000" style="width:45px">
     </div>
+
     <div class="form-row">
-        <label for="node-config-input-port"><i class="fa fa-server"></i> Port</label>
-        <input type="text" id="node-config-input-port">
+        <label for="node-config-input-useTls" style="width: auto;"><i class="fa fa-exchange"></i> Enable secure (SSL/TLS) connection</label>
+        <input type="checkbox" id="node-config-input-useTls" style="display: inline-block; width: auto; vertical-align: top;">
     </div>
-    <div class="form-row">
-        <label for="node-config-input-protocol"><i class="fa fa-exchange"></i> Protocol</label>
-        <input type="text" id="node-config-input-protocol">
-    </div>
+
     <div class="form-row">
         <label for="node-config-input-accessToken"><i class="fa fa-key"></i> Access token</label>
         <input type="text" id="node-config-input-accessToken" placeholder="none">

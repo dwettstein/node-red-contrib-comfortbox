@@ -5,9 +5,9 @@ var apiRequest = require('../lib/apiRequest.js');
 module.exports = function(RED) {
   function ComfortboxApiServerNode(config) {
     RED.nodes.createNode(this, config);
-    this.host = config.host;
-    this.port = config.port;
-    this.protocol = config.protocol;
+    this.host = config.host || 'localhost';
+    this.port = config.port || '3000';
+    this.useTls = config.useTls || false;
     this.accessToken = config.accessToken;
   }
 
@@ -40,7 +40,7 @@ module.exports = function(RED) {
         options.rejectUnauthorized = false;
       }
 
-      apiRequest(server.protocol, 'txt', options, payload, function(resObj) {
+      apiRequest(server.useTls ? 'https' : 'http', 'txt', options, payload, function(resObj) {
         res.setHeader('Content-Type', 'application/json');
         if (resObj && resObj.statusCode / 100 !== 2) {
           res.send(JSON.stringify(resObj));

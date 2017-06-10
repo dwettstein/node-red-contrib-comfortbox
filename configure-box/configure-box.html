@@ -79,6 +79,7 @@
                 if (currentBoxOption && node.device !== 'payload' && node.device !== 'manual') {
                     $('#node-input-device option:contains("' + currentBoxOption + '")').prop('selected', true);
                 }
+                $('#node-input-device').click(); // Trigger a click event for initialization.
             });
 
             $('#node-input-server').on('click', function() {

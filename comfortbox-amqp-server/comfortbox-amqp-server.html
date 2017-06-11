@@ -1,0 +1,85 @@
+<script type="text/javascript">
+    RED.nodes.registerType('comfortbox-amqp-server', {
+        category: 'config',
+        defaults: {
+            host: {value: 'localhost', required: true},
+            port: {value: 5672, required: true, validate: RED.validators.number()},
+            useTls: {value: false},
+            vhost: {value: ''},
+            keepalive: {value: 30, validate: RED.validators.number()}
+        },
+        credentials: {
+            user: {type: 'text'},
+            password: {type: 'password'}
+        },
+        label: function() {
+            return (this.useTls ? 'amqps' : 'amqp') + '://' + (this.host || 'localhost') + (this.port ? ':' + this.port : '');
+        },
+        oneditprepare: function() {
+            var tabs = RED.tabs.create({
+                id: 'node-comfortbox-amqp-server-tabs',
+                onchange: function (tab) {
+                    $('#node-comfortbox-amqp-server-tabs-content').children().hide();
+                    $('#' + tab.id).show();
+                }
+            });
+            tabs.addTab({
+                id: 'comfortbox-amqp-server-tab-connection',
+                label: 'Connection'
+            });
+            tabs.addTab({
+                id: 'comfortbox-amqp-server-tab-security',
+                label: 'Security'
+            });
+            setTimeout(function() {
+                tabs.resize();
+            }, 0);
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="comfortbox-amqp-server">
+    <div class="form-row">
+        <ul style="background: #fff; min-width: 400px; margin-bottom: 20px;" id="node-comfortbox-amqp-server-tabs"></ul>
+    </div>
+
+    <div id="node-comfortbox-amqp-server-tabs-content" style="min-height: 170px;">
+
+        <div id="comfortbox-amqp-server-tab-connection" style="display:none">
+            <div class="form-row">
+                <label for="node-config-input-host"><i class="fa fa-globe"></i> Server</label>
+                <input class="input-append-left" type="text" id="node-config-input-host" placeholder="localhost" style="width: 45%">
+
+                <label for="node-config-input-port" style="margin-left: 10px; width: 35px;"> Port</label>
+                <input type="text" id="node-config-input-port" placeholder="5672" style="width: 13%">
+            </div>
+
+            <div class="form-row">
+                <label for="node-config-input-useTls" style="width: auto;"><i class="fa fa-exchange"></i> Enable secure (SSL/TLS) connection</label>
+                <input type="checkbox" id="node-config-input-useTls" style="display: inline-block; width: auto; vertical-align: top;">
+            </div>
+
+            <div class="form-row">
+                <label for="node-config-input-vhost"><i class="fa fa-home"></i> Virtual host</label>
+                <input type="text" id="node-config-input-vhost" placeholder="Optional virtual host id">
+            </div>
+
+            <div class="form-row">
+                <label for="node-config-input-keepalive" style="width: auto"><i class="fa fa-clock-o"></i> Keep alive time (s)</label>
+                <input type="text" id="node-config-input-keepalive" style="width:45px">
+            </div>
+        </div>
+
+        <div id="comfortbox-amqp-server-tab-security" style="display:none">
+            <div class="form-row">
+                <label for="node-config-input-user"><i class="fa fa-user"></i> User</label>
+                <input type="text" id="node-config-input-user" >
+            </div>
+
+            <div class="form-row">
+                <label for="node-config-input-password"><i class="fa fa-lock"></i> Password</label>
+                <input type="password" id="node-config-input-password" >
+            </div>
+        </div>
+    </div>
+</script>

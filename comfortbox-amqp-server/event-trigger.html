@@ -1,0 +1,186 @@
+<script type="text/javascript">
+    RED.nodes.registerType('event trigger', {
+        category: 'comfortbox',
+        color: '#DAC4B4',
+        defaults: {
+            name: {value: ''},
+            amqpServer: {type: 'comfortbox-amqp-server', required: true},
+            server: {type: 'comfortbox-api-server', required: true},
+            device: {required: true, value: 'manual'},
+            boxId: {validate: RED.validators.regex(/^(\d)?$/)},
+            particleId: {value: '', validate: RED.validators.regex(/^([a-fA-F0-9]{24})?$/)},
+            metricName: {value: '', required: true},
+            queueName: {value: ''}
+        },
+        inputs: 0,
+        outputs: 1,
+        icon: 'bridge.png',
+        label: function() {
+            return this.name || this.queueName || 'event trigger';
+        },
+        labelStyle: function() {
+            return this.name ? 'node_label_italic' : '';
+        },
+        oneditprepare: function () {
+            var node = this;
+            var devices;
+            var currentBoxOption = node.boxId ? ' - ' + node.boxId : '';
+
+            function updateDevices(server, callback) {
+                $('#node-input-device').empty();
+                $('<option/>', {value: 'manual', text: 'manual inputs'}).appendTo('#node-input-device');
+                $('#node-input-device-error').remove();
+
+                if (!server && !node.server) {
+                    var serverOptions = $('#node-input-server option');
+                    // If there is only one server option then it is the option "_ADD_".
+                    if (serverOptions && serverOptions.length > 1) {
+                        var firstOption = serverOptions.first();
+                        if (firstOption.val() !== '_ADD_') {
+                            firstOption.prop('selected', true);
+                            node.server = firstOption.val();
+                            server = node.server;
+                        }
+                    }
+                }
+
+                if (server) {
+                    // See here: https://stackoverflow.com/questions/37265230/node-red-get-configuration-node-value-in-admin-ui
+                    $.getJSON('node-red/ComfortBoxes?server=' + server, function(data) {
+                        if (data.statusCode && data.statusCode / 100 != 2) {
+                            $('#node-input-device').parent().before('<div id="node-input-device-error" class="notification notification-error">' + data.error + '</div>');
+                        } else {
+                            devices = data;
+                            if (devices.length > 0) {
+                                for (var d in devices) {
+                                    if (devices.hasOwnProperty(d)) {
+                                        $('<option/>', {
+                                            value: JSON.stringify(devices[d]),
+                                            text: devices[d].name + ' - ' + devices[d].id
+                                        }).appendTo('#node-input-device');
+                                    }
+                                }
+                            }
+                            if (callback && typeof callback === 'function') {
+                                callback();
+                            }
+                        }
+                    });
+                }
+            }
+            updateDevices(node.server, function () {
+                // Select option by name, see here: https://stackoverflow.com/questions/314636/how-do-you-select-a-particular-option-in-a-select-element-in-jquery
+                if (currentBoxOption && node.device !== 'payload' && node.device !== 'manual') {
+                    $('#node-input-device option:contains("' + currentBoxOption + '")').prop('selected', true);
+                }
+                $('#node-input-device').click(); // Trigger a click event for initialization.
+            });
+
+            $('#node-input-server').on('click', function() {
+                var selected = $('#node-input-server option:selected').first().val();
+                if (selected && selected !== '_ADD_') {
+                    node.server = selected;
+                }
+                $('#node-input-boxId').val();
+                $('#node-input-boxName').val('');
+                $('#node-input-particleId').val('');
+                $('#node-input-labels').val('');
+                updateDevices(node.server, null);
+            });
+
+            $('#node-input-device').on('click', function() {
+                var selected = $('#node-input-device option:selected').first().val();
+                if (selected && selected !== 'payload' && selected !== 'manual') {
+                    var selectedDevice = JSON.parse(selected);
+                    if (selectedDevice) {
+                        $('#node-input-boxId').val(selectedDevice.id);
+                        $('#node-input-boxId').prop('readonly', true);
+                        $('#node-input-boxName').val(selectedDevice.name);
+                        $('#node-input-particleId').val(selectedDevice.particleId);
+                        $('#node-input-particleId').prop('readonly', true);
+                        $('#node-input-labels').val(selectedDevice.labels ? selectedDevice.labels.join(', ') : '');
+                    }
+                } else if (selected === 'payload') {
+                    $('#node-input-boxId').prop('readonly', true);
+                    $('#node-input-particleId').prop('readonly', true);
+                } else {
+                    $('#node-input-boxId').prop('readonly', false);
+                    $('#node-input-particleId').prop('readonly', false);
+                }
+            });
+
+            $('#node-input-metricName').on('select', function() {
+                var selectedMetricName = $('#node-input-metricName option:selected').first().val();
+                var inputParticleId = $('#node-input-particleId').val();
+                if (selectedMetricName && inputParticleId ) {
+                    $('#node-input-queueName').val('comfort.' + inputParticleId + '.' + selectedMetricName);
+                } else {
+                    $('#node-input-queueName').val('');
+                }
+            });
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="event trigger">
+    <div class="form-row">
+        <label for="node-input-amqpServer"><i class="fa fa-globe"></i> AMQP server</label>
+        <input type="text" id="node-input-amqpServer" placeholder="AMQP server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-globe"></i> API server</label>
+        <input type="text" id="node-input-server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-device"><i class="fa fa-tasks"></i> Device</label>
+        <select id="node-input-device">
+            <option value="manual">manual inputs</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-boxId"><i class="fa fa-id-card"></i> Box id</label>
+        <input type="text" id="node-input-boxId" readonly>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-particleId"><i class="fa fa-id-card"></i> Particle id</label>
+        <input type="text" id="node-input-particleId" placeholder="0123456789abcdef01234567">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-metricName"><i class="fa fa-line-chart"></i> Metric</label>
+        <select type="text" id="node-input-metricName" style="width:70%;">
+            <option value="temp">temperature</option>
+            <option value="hum">humidity</option>
+            <option value="co2">CO2</option>
+            <option value="hpa">pressure</option>
+            <option value="wind">wind</option>
+            <option value="lux">illuminance</option>
+            <option value="sound">sound level</option>
+            <option value="bat">battery level</option>
+            <option value="online">online event</option>
+            <option value="offline">offline event</option>
+            <option value="event.button.0">button thumb-up event</option>
+            <option value="event.button.1">button thumb-down event</option>
+            <option value="event.tap">tap event</option>
+            <option value="event.dtap">double-tap event</option>
+        </select>
+    </div>
+
+    <div class="form-row" style="display: none;">
+        <label for="node-input-queueName"><i class="fa fa-filter"></i> Queue name</label>
+        <input type="text" id="node-input-queueName">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="event trigger">
+   <p>Trigger a flow based on an event from the given ComfortBox device.</p>
+</script>

@@ -10,6 +10,8 @@
   "node-red": {
     "nodes": {
       "comfortbox-api-server": "comfortbox-api-server/comfortbox-api-server.js",
+      "comfortbox-amqp-server": "comfortbox-amqp-server/comfortbox-amqp-server.js",
+      "event trigger": "comfortbox-amqp-server/event-trigger.js",
       "display text": "display-text/display-text.js",
       "register box": "register-box/register-box.js",
       "configure box": "configure-box/configure-box.js"
@@ -18,7 +20,9 @@
   "scripts": {
     "lint": "./node_modules/.bin/eslint ."
   },
-  "dependencies": {},
+  "dependencies": {
+    "amqplib": "^0.5.1"
+  },
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-loopback": "^8.0.0"

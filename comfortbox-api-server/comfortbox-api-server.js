@@ -5,6 +5,7 @@ var apiRequest = require('../lib/apiRequest.js');
 module.exports = function(RED) {
   function ComfortboxApiServerNode(config) {
     RED.nodes.createNode(this, config);
+
     this.host = config.host || 'localhost';
     this.port = config.port || '3000';
     this.useTls = config.useTls || false;

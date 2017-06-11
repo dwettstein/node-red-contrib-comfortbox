@@ -63,7 +63,7 @@ module.exports = function(RED) {
           options.rejectUnauthorized = false;
         }
 
-        apiRequest(node.server.protocol, node.return, options, payload, function(res) {
+        apiRequest(node.server.useTls, node.return, options, payload, function(res) {
           node.status({});
           if (res && res.statusCode / 100 !== 2) {
             node.error(res);

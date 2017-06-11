@@ -106,7 +106,7 @@ module.exports = function(RED) {
           boxPatchOptions.rejectUnauthorized = false;
         }
 
-        apiRequest(node.server.protocol, node.return, boxPatchOptions, boxPatchPayload, function(res) {
+        apiRequest(node.server.useTls, node.return, boxPatchOptions, boxPatchPayload, function(res) {
           if (res && res.statusCode / 100 !== 2) {
             node.error(res);
             node.status({fill: 'red', shape: 'ring', text: res.statusCode});

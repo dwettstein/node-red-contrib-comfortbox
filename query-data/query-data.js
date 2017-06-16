@@ -36,9 +36,9 @@ module.exports = function(RED) {
           node.boxId = node.device.id;
           node.particleId = node.device.particleId;
         } catch (e) {
-          node.error(e);
-          node.status({fill: 'red', shape: 'ring', text: e});
-          msg.payload = e;
+          node.error(e.message);
+          node.status({fill: 'red', shape: 'ring', text: e.message});
+          msg.payload = e.message;
           node.send(msg);
           return;
         }
@@ -55,9 +55,9 @@ module.exports = function(RED) {
             node.device = JSON.parse(node.device);
           }
         } catch (e) {
-          node.error(e);
-          node.status({fill: 'red', shape: 'ring', text: e});
-          msg.payload = e;
+          node.error(e.message);
+          node.status({fill: 'red', shape: 'ring', text: e.message});
+          msg.payload = e.message;
           node.send(msg);
           return;
         }

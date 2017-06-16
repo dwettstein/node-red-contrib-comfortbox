@@ -18,23 +18,36 @@ module.exports = function(RED) {
     node.on('input', function(msg) {
       if (node.device === 'payload') {
         try {
-          node.device = JSON.parse(msg.payload);
+          if (typeof msg.payload === 'string') {
+            node.device = JSON.parse(msg.payload);
+          } else {
+            node.device = msg.payload;
+          }
+          node.boxId = node.device.id;
+          node.particleId = node.device.particleId;
         } catch (e) {
-          node.error(e);
-          node.status({fill: 'red', shape: 'ring', text: e});
-          msg.payload = e;
+          node.error(e.message);
+          node.status({fill: 'red', shape: 'ring', text: e.message});
+          msg.payload = e.message;
           node.send(msg);
           return;
         }
       } else if (node.device === 'manual') {
-        node.device = null;
+        node.device = {
+          id: node.boxId,
+          name: node.boxName,
+          particleId: node.particleId,
+          labels: node.labels,
+        };
       } else {
         try {
-          node.device = JSON.parse(node.device);
+          if (typeof node.device === 'string') {
+            node.device = JSON.parse(node.device);
+          }
         } catch (e) {
-          node.error(e);
-          node.status({fill: 'red', shape: 'ring', text: e});
-          msg.payload = e;
+          node.error(e.message);
+          node.status({fill: 'red', shape: 'ring', text: e.message});
+          msg.payload = e.message;
           node.send(msg);
           return;
         }

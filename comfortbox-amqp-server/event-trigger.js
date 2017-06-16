@@ -76,7 +76,7 @@ module.exports = function(RED) {
         });
       }
 
-      node.queue = node.channel.assertQueue(node.queueName, {durable: true});
+      node.queue = node.channel.assertQueue(node.queueName, {durable: false, exclusive: true, autoDelete: true});
       node.queue.then(function() {
         node.channel.bindQueue(node.queueName, 'amq.topic', node.routingKey).then(function() {
           node.log('Starting to consume messages');

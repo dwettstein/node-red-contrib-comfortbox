@@ -13,6 +13,7 @@
       "comfortbox-amqp-server": "comfortbox-amqp-server/comfortbox-amqp-server.js",
       "event trigger": "comfortbox-amqp-server/event-trigger.js",
       "display text": "display-text/display-text.js",
+      "display color": "display-color/display-color.js",
       "register box": "register-box/register-box.js",
       "configure box": "configure-box/configure-box.js"
     }

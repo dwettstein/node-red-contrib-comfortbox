@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('display text', {
+    RED.nodes.registerType('display color', {
         category: 'comfortbox',
         color: '#DAC4B4',
         defaults: {
@@ -7,14 +7,27 @@
             server: {type: 'comfortbox-api-server', required: true},
             device: {required: true, value: 'manual'},
             boxId: {validate: RED.validators.regex(/^(\d)?$/)},
-            text: {value: ''},
+            color1: {required: true, value: ''},
+            color2: {value: ''},
+            color3: {value: ''},
+            color4: {value: ''},
+            color5: {value: ''},
+            color6: {value: ''},
+            color7: {value: ''},
+            color8: {value: ''},
+            color9: {value: ''},
+            color10: {value: ''},
+            color11: {value: ''},
+            color12: {value: ''},
+            useForAll: {value: true},
+            selectedLeds: {value: ''},
             return: {value: 'txt'}
         },
         inputs: 1,
         outputs: 1,
-        icon: 'envelope.png',
+        icon: 'light.png',
         label: function() {
-            return this.name || (this.boxId ? 'display text on box ' + this.boxId : 'display text');
+            return this.name || (this.boxId ? 'display color on box ' + this.boxId : 'display color');
         },
         labelStyle: function() {
             return this.name ? 'node_label_italic' : '';
@@ -104,11 +117,18 @@
                     $('#node-input-boxId').prop('readonly', false);
                 }
             });
+
+            $('#node-input-useForAll').on('click', function() {
+                for (var i = 2; i <= 12; i++) {
+                    // if useForAll is checked, hide the additional color pickers
+                    $('#node-input-color' + i).parent().toggle(!this.checked);
+                }
+            });
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="display text">
+<script type="text/x-red" data-template-name="display color">
     <div class="form-row">
         <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
         <input type="text" id="node-input-server">
@@ -128,8 +148,58 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-text"><i class="fa fa-file-text"></i> Text</label>
-        <input type="text" id="node-input-text" placeholder="leave empty for msg.payload">
+        <label for="node-input-color1"><i class="fa fa-lightbulb-o"></i> Color</label>
+        <input type="color" id="node-input-color1">
+    </div>
+
+    <div class="form-row">
+        <input type="checkbox" id="node-input-useForAll" style="display: inline-block; width: auto; vertical-align: top;" checked>
+        <label for="node-input-useForAll" style="width: auto;">Use same color for all LEDs</label>
+    </div>
+
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color2"><i class="fa fa-lightbulb-o"></i> Color LED 2</label>
+        <input type="color" id="node-input-color2">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color3"><i class="fa fa-lightbulb-o"></i> Color LED 3</label>
+        <input type="color" id="node-input-color3">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color4"><i class="fa fa-lightbulb-o"></i> Color LED 4</label>
+        <input type="color" id="node-input-color4">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color5"><i class="fa fa-lightbulb-o"></i> Color LED 5</label>
+        <input type="color" id="node-input-color5">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color6"><i class="fa fa-lightbulb-o"></i> Color LED 6</label>
+        <input type="color" id="node-input-color6">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color7"><i class="fa fa-lightbulb-o"></i> Color LED 7</label>
+        <input type="color" id="node-input-color7">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color8"><i class="fa fa-lightbulb-o"></i> Color LED 8</label>
+        <input type="color" id="node-input-color8">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color9"><i class="fa fa-lightbulb-o"></i> Color LED 9</label>
+        <input type="color" id="node-input-color9">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color10"><i class="fa fa-lightbulb-o"></i> Color LED 10</label>
+        <input type="color" id="node-input-color10">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color11"><i class="fa fa-lightbulb-o"></i> Color LED 11</label>
+        <input type="color" id="node-input-color11">
+    </div>
+    <div class="form-row" style="display: none;">
+        <label for="node-input-color12"><i class="fa fa-lightbulb-o"></i> Color LED 12</label>
+        <input type="color" id="node-input-color12">
     </div>
 
     <div class="form-row">
@@ -147,6 +217,6 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="display text">
-    <p>Displays text on a ComfortBox.</p>
+<script type="text/x-red" data-help-name="display color">
+    <p>Displays color on a ComfortBox.</p>
 </script>

@@ -32,12 +32,12 @@ module.exports = function(RED) {
             // execute node specific initialization
             node.initialize();
           }).catch(function(err) {
-            node.status({fill: 'red', shape: 'dot', text: 'connect error'});
+            node.status({fill: 'red', shape: 'dot', text: err.message});
             node.error('Connect error: ' + err.message);
           });
         }).then(null, node.error);
       }).catch(function(err) {
-        node.status({fill: 'red', shape: 'dot', text: 'connect error'});
+        node.status({fill: 'red', shape: 'dot', text: err.message});
         node.error('Connect error: ' + err.message);
       });
 
@@ -51,7 +51,7 @@ module.exports = function(RED) {
             node.status({fill: 'red', shape: 'ring', text: 'disconnected'});
           }).catch(function(err) {
             node.amqpServer.freeConnection();
-            node.status({fill: 'red', shape: 'dot', text: 'disconnect error'});
+            node.status({fill: 'red', shape: 'dot', text: err.message});
             node.error('Disconnect error: ' + err.message);
           });
         } else {
@@ -60,8 +60,9 @@ module.exports = function(RED) {
         }
       });
     } else {
-      node.status({fill: 'red', shape: 'dot', text: 'error'});
-      node.error('Error: missing AMQP server configuration');
+      var err = 'missing AMQP server configuration';
+      node.status({fill: 'red', shape: 'dot', text: err});
+      node.error(err);
     }
 
     // node specific initialization code
@@ -82,11 +83,17 @@ module.exports = function(RED) {
           node.log('Starting to consume messages');
           node.channel.consume(node.queueName, handleMsg.bind(this), {noAck: true}).then(function() {
             node.status({fill: 'green', shape: 'dot', text: 'connected'});
-          }).catch(function(e) {
-            node.status({fill: 'red', shape: 'dot', text: 'error'});
-            node.error('Error: ' + e.message);
+          }).catch(function(err) {
+            node.status({fill: 'red', shape: 'dot', text: err.message});
+            node.error(err.message);
           });
+        }).catch(function(err) {
+          node.status({fill: 'red', shape: 'dot', text: err.message});
+          node.error(err.message);
         });
+      }).catch(function(err) {
+        node.status({fill: 'red', shape: 'dot', text: err.message});
+        node.error(err.message);
       });
     };
   }

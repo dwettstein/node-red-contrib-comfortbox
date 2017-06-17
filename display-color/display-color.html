@@ -19,6 +19,18 @@
             color10: {value: ''},
             color11: {value: ''},
             color12: {value: ''},
+            color13: {value: ''},
+            color14: {value: ''},
+            color15: {value: ''},
+            color16: {value: ''},
+            color17: {value: ''},
+            color18: {value: ''},
+            color19: {value: ''},
+            color20: {value: ''},
+            color21: {value: ''},
+            color22: {value: ''},
+            color23: {value: ''},
+            color24: {value: ''},
             useForAll: {value: true},
             selectedLeds: {value: ''},
             return: {value: 'txt'}
@@ -119,11 +131,12 @@
             });
 
             $('#node-input-useForAll').on('click', function() {
-                for (var i = 2; i <= 12; i++) {
+                for (var i = 2; i <= 24; i++) {
                     // if useForAll is checked, hide the additional color pickers
                     $('#node-input-color' + i).parent().toggle(!this.checked);
                 }
             });
+            $('#node-input-useForAll').click();
         }
     });
 </script>
@@ -157,49 +170,97 @@
         <label for="node-input-useForAll" style="width: auto;">Use same color for all LEDs</label>
     </div>
 
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color2"><i class="fa fa-lightbulb-o"></i> Color LED 2</label>
         <input type="color" id="node-input-color2">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color3"><i class="fa fa-lightbulb-o"></i> Color LED 3</label>
         <input type="color" id="node-input-color3">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color4"><i class="fa fa-lightbulb-o"></i> Color LED 4</label>
         <input type="color" id="node-input-color4">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color5"><i class="fa fa-lightbulb-o"></i> Color LED 5</label>
         <input type="color" id="node-input-color5">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color6"><i class="fa fa-lightbulb-o"></i> Color LED 6</label>
         <input type="color" id="node-input-color6">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color7"><i class="fa fa-lightbulb-o"></i> Color LED 7</label>
         <input type="color" id="node-input-color7">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color8"><i class="fa fa-lightbulb-o"></i> Color LED 8</label>
         <input type="color" id="node-input-color8">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color9"><i class="fa fa-lightbulb-o"></i> Color LED 9</label>
         <input type="color" id="node-input-color9">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color10"><i class="fa fa-lightbulb-o"></i> Color LED 10</label>
         <input type="color" id="node-input-color10">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color11"><i class="fa fa-lightbulb-o"></i> Color LED 11</label>
         <input type="color" id="node-input-color11">
     </div>
-    <div class="form-row" style="display: none;">
+    <div class="form-row">
         <label for="node-input-color12"><i class="fa fa-lightbulb-o"></i> Color LED 12</label>
         <input type="color" id="node-input-color12">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color13"><i class="fa fa-lightbulb-o"></i> Color LED 13</label>
+        <input type="color" id="node-input-color13">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color14"><i class="fa fa-lightbulb-o"></i> Color LED 14</label>
+        <input type="color" id="node-input-color14">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color15"><i class="fa fa-lightbulb-o"></i> Color LED 15</label>
+        <input type="color" id="node-input-color15">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color16"><i class="fa fa-lightbulb-o"></i> Color LED 16</label>
+        <input type="color" id="node-input-color16">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color17"><i class="fa fa-lightbulb-o"></i> Color LED 17</label>
+        <input type="color" id="node-input-color17">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color18"><i class="fa fa-lightbulb-o"></i> Color LED 18</label>
+        <input type="color" id="node-input-color18">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color19"><i class="fa fa-lightbulb-o"></i> Color LED 19</label>
+        <input type="color" id="node-input-color19">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color20"><i class="fa fa-lightbulb-o"></i> Color LED 20</label>
+        <input type="color" id="node-input-color20">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color21"><i class="fa fa-lightbulb-o"></i> Color LED 21</label>
+        <input type="color" id="node-input-color21">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color22"><i class="fa fa-lightbulb-o"></i> Color LED 22</label>
+        <input type="color" id="node-input-color22">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color23"><i class="fa fa-lightbulb-o"></i> Color LED 23</label>
+        <input type="color" id="node-input-color23">
+    </div>
+    <div class="form-row">
+        <label for="node-input-color24"><i class="fa fa-lightbulb-o"></i> Color LED 24</label>
+        <input type="color" id="node-input-color24">
     </div>
 
     <div class="form-row">

@@ -137,7 +137,7 @@
                 }
             });
             if (typeof node.useForAll === 'boolean') {
-                $('#node-input-useForAll').prop('checked', node.useForAll);
+                $('#node-input-useForAll').prop('checked', !node.useForAll);
             }
             $('#node-input-useForAll').click();
         }

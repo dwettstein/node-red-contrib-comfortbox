@@ -136,6 +136,9 @@
                     $('#node-input-color' + i).parent().toggle(!this.checked);
                 }
             });
+            if (typeof node.useForAll === 'boolean') {
+                $('#node-input-useForAll').prop('checked', node.useForAll);
+            }
             $('#node-input-useForAll').click();
         }
     });
@@ -161,15 +164,14 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-color1"><i class="fa fa-lightbulb-o"></i> Color</label>
-        <input type="color" id="node-input-color1">
-    </div>
-
-    <div class="form-row">
-        <input type="checkbox" id="node-input-useForAll" style="display: inline-block; width: auto; vertical-align: top;" checked>
+        <input type="checkbox" id="node-input-useForAll" style="display: inline-block; width: auto; vertical-align: top;">
         <label for="node-input-useForAll" style="width: auto;">Use same color for all LEDs</label>
     </div>
 
+    <div class="form-row">
+        <label for="node-input-color1"><i class="fa fa-lightbulb-o"></i> Color LED 1</label>
+        <input type="color" id="node-input-color1">
+    </div>
     <div class="form-row">
         <label for="node-input-color2"><i class="fa fa-lightbulb-o"></i> Color LED 2</label>
         <input type="color" id="node-input-color2">

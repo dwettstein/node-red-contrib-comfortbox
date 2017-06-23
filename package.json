@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-comfortbox",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "license": "MIT",
   "description": "Node-RED package with nodes for configuring and using the ComfortBox API services (https://github.com/dwettstein/comfortbox-api-services)",
   "repository": "github:dwettstein/node-red-contrib-comfortbox",

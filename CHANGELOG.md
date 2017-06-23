@@ -6,8 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+
+
+## [0.2.0] - 2017-06-23
+### Added
 - Node `event trigger`
 - Node `display color`
+
+### Changed
+- Update example flows
+
+### Fixed
+- Regex for boxId
+
 
 ## [0.1.0] - 2017-06-09
 ### Added
@@ -19,5 +30,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Node `query data`
 - Example flows
 
-[Unreleased]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/dwettstein/node-red-contrib-comfortbox/tree/v0.1.0

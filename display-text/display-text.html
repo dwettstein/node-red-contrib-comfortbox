@@ -6,7 +6,7 @@
             name: {value: ''},
             server: {type: 'comfortbox-api-server', required: true},
             device: {required: true, value: 'manual'},
-            boxId: {validate: RED.validators.regex(/^(\d)?$/)},
+            boxId: {validate: RED.validators.regex(/^(\d*|([0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}))$/i)},
             text: {value: ''},
             return: {value: 'txt'}
         },

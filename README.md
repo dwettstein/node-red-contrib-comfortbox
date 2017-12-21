@@ -4,12 +4,14 @@ _node-red-contrib-comfortbox_ is a [Node-RED](https://nodered.org/) package cont
 ## Overview
 The package contains the following Node-RED nodes:
 
+- `comfortbox-amqp-server` \- A configuration node to set an AMQP endpoint for the event trigger.
 - `comfortbox-api-server` \- A configuration node to set the API endpoint.
-- `register box` \- A node to register a new comfortbox device to the API services.
-- `configure box`\- A node to configure a registered comfortbox device (e.g. set the MQTT host).
-- `query data` \- A node to query data of a comfortbox device.
-- `display text` \- A node to display a text on a comfortbox device.
-- `display color` \- A node to display one or multiple colors on a comfortbox device.
+- `event trigger` \- A node to trigger a flow from an AMQP event.
+- `configure box`\- A node to configure a registered ComfortBox device (e.g. set the MQTT host).
+- `display color` \- A node to display one or multiple colors on a ComfortBox device.
+- `display text` \- A node to display a text on a ComfortBox device.
+- `query data` \- A node to query data of a ComfortBox device.
+- `register box` \- A node to register a new ComfortBox device to the API services.
 
 ## Example flows
 For adding the examples to your Node-RED installation, just copy the content of the file [Usecase flows](./examples/usecase_flows.json) and import it to Node-RED using the clipboard import.

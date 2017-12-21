@@ -13,7 +13,7 @@
             return: {value: 'txt'},
             mqttHost: {value: ''},
             mqttPort: {value: '1883', validate: RED.validators.number()},
-            dataInterval: {value: '', validate: RED.validators.regex(/^(\d)?$/)},
+            dataInterval: {value: '', validate: RED.validators.regex(/^(\d*)?$/)},
             worktime: {value: '', validate: RED.validators.regex(/^(([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9])?$/)},
             doShowDataRegularly: {value: '', validate: RED.validators.regex(/^(true|false)?$/)}
         },

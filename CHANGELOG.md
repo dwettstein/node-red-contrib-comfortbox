@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 
+## [0.2.1] - 2017-12-27
+### Added
+- Use case reconfigure all
+
+### Changed
+- Update example flows
+
+### Fixed
+- Regex for dataInterval
+
 
 ## [0.2.0] - 2017-06-23
 ### Added
@@ -30,6 +40,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Node `query data`
 - Example flows
 
-[Unreleased]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/dwettstein/node-red-contrib-comfortbox/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/dwettstein/node-red-contrib-comfortbox/tree/v0.1.0

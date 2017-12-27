@@ -16,17 +16,20 @@ The package contains the following Node-RED nodes:
 ## Example flows
 For adding the examples to your Node-RED installation, just copy the content of the file [Usecase flows](./examples/usecase_flows.json) and import it to Node-RED using the clipboard import.
 
-### Usecase register
-This usecase shows how to register multiple comfortbox devices to the API services.
+### Use Case 1: Register multiple devices
+This use case shows how to register multiple comfortbox devices to the API services.
 
 ![usecase_register.png](./examples/usecase_register.png)
 
-### Usecase button
-This usecase shows an example of how to add functionality to a button.
+### Use Case 2: Reconfigure all devices
+This use case shows how to reconfigure all registered devices (e.g. changing the MQTT host).
+
+![usecase_reconfigure.png](./examples/usecase_reconfigure.png)
+
+### Use Case 3: Listen to button thumb-down
+This use case shows an example of how to listen to a specific event. This can also be used to add functionality to the device buttons.
 
 ![usecase_button.png](./examples/usecase_button.png)
 
-
 ## Installation
 Currently, the package is not yet available from the _npm repository_. For installing the nodes, just clone the repository into your Node-RED user folder (usually `~/.node-red/nodes`) and run `npm install .`.
-
